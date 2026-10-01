@@ -95,7 +95,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, host, () => {
-  console.log(`\n  🚀 Simple Streak Tracker Dev Server running at:\n`);
+  console.log(`\n  🚀 literate-robot Dev Server running at:\n`);
   console.log(`  ➜  Local:   http://${host === '0.0.0.0' ? 'localhost' : host}:${port}/`);
   if (host === '0.0.0.0') {
     const ips = getLocalIpAddresses();
