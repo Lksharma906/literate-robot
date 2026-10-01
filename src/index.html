@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Simple, lightweight habit and streak tracker with local CSV data ownership.">
+  <meta name="theme-color" content="#2563eb">
+  <title>Streak Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation & Storage Bar -->
+    <header class="app-header">
+      <div class="brand">
+        <h1 class="app-title">🔥 Streaks</h1>
+        <span id="date-display" class="current-date" aria-live="polite">Today</span>
+      </div>
+
+      <div class="storage-toolbar" role="toolbar" aria-label="Storage and File Actions">
+        <button id="btn-open-file" class="btn btn-secondary btn-sm" title="Open CSV file from local disk or cloud folder">
+          📂 Open CSV
+        </button>
+        <button id="btn-import-csv" class="btn btn-secondary btn-sm" title="Import habits from CSV">
+          📥 Import
+        </button>
+        <input type="file" id="file-input" accept=".csv" class="visually-hidden" aria-label="Upload CSV file">
+        <button id="btn-export-csv" class="btn btn-primary btn-sm" title="Export habits to CSV file">
+          💾 Export CSV
+        </button>
+        <span id="sync-status" class="sync-badge" title="Storage status">Local</span>
+      </div>
+    </header>
+
+    <!-- Main Module Navigation -->
+    <nav class="module-nav" role="tablist" aria-label="Main Application Modules">
+      <button role="tab" id="nav-mod-habits" class="module-tab active" aria-selected="true" data-module="habits">
+        🔥 Habits &amp; Streaks
+      </button>
+      <button role="tab" id="nav-mod-gym" class="module-tab" aria-selected="false" data-module="gym">
+        🏋️ Gym &amp; Weights
+      </button>
+      <button role="tab" id="nav-mod-cardio" class="module-tab" aria-selected="false" data-module="cardio">
+        🏃 Cardio
+      </button>
+      <button role="tab" id="nav-mod-weight" class="module-tab" aria-selected="false" data-module="weight">
+        ⚖️ Body Weight
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- 1. HABITS MODULE VIEW -->
+      <div id="module-habits" class="module-view">
+        <!-- Filter Bar -->
+        <section class="controls-section" aria-label="Habit Filters and Quick Actions">
+          <div class="filter-tabs" role="tablist" aria-label="Habit status filters">
+            <button role="tab" id="tab-active" class="tab-btn active" aria-selected="true" data-filter="active">Active</button>
+            <button role="tab" id="tab-all" class="tab-btn" aria-selected="false" data-filter="all">All</button>
+            <button role="tab" id="tab-archived" class="tab-btn" aria-selected="false" data-filter="archived">Archived</button>
+          </div>
+          <button id="btn-add-habit" class="btn btn-primary" aria-haspopup="dialog">+ New Habit</button>
+        </section>
+
+        <!-- Habit List Container -->
+        <section class="habits-section" aria-label="Habits for Today">
+          <ul id="habit-list" class="habit-list" aria-live="polite">
+            <!-- Dynamically populated -->
+          </ul>
+          <div id="empty-state" class="empty-state hidden">
+            <div class="empty-icon">🎯</div>
+            <h2>No habits yet</h2>
+            <p>Start tracking your consistency by creating your first daily habit.</p>
+            <button id="btn-empty-add" class="btn btn-primary">+ Create First Habit</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- 2. GYM & WEIGHTS MODULE VIEW -->
+      <div id="module-gym" class="module-view hidden">
+        <!-- Dynamically rendered by GymView -->
+      </div>
+
+      <!-- 3. CARDIO MODULE VIEW -->
+      <div id="module-cardio" class="module-view hidden">
+        <!-- Dynamically rendered by CardioView -->
+      </div>
+
+      <!-- 4. BODY WEIGHT MODULE VIEW -->
+      <div id="module-weight" class="module-view hidden">
+        <!-- Dynamically rendered by BodyWeightView -->
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>100% Private &amp; Local • Data stored in transparent CSV • No tracking or servers</p>
+    </footer>
+  </div>
+
+  <!-- Add / Edit Habit Modal Dialog -->
+  <dialog id="habit-modal" class="modal" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">Create New Habit</h2>
+        <button type="button" id="btn-close-modal" class="btn-icon" aria-label="Close dialog">✕</button>
+      </div>
+      <form id="habit-form" novalidate>
+        <input type="hidden" id="edit-habit-id" value="">
+        <div class="form-group">
+          <label for="habit-name-input">Habit Name <span class="required">*</span></label>
+          <input type="text" id="habit-name-input" name="name" maxlength="60" required placeholder="e.g., Read 20 mins, Drink 2L water" autocomplete="off">
+          <div id="habit-name-error" class="form-error" aria-live="polite"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel-habit" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="btn-save-habit" class="btn btn-primary">Save Habit</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Habit Details & History Modal -->
+  <dialog id="history-modal" class="modal" aria-labelledby="history-modal-title">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <div>
+          <h2 id="history-modal-title">Habit Details</h2>
+          <p id="history-subtitle" class="text-muted"></p>
+        </div>
+        <button type="button" id="btn-close-history" class="btn-icon" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="history-body">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-value" id="stat-current-streak">0</span>
+            <span class="stat-label">Current Streak</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-longest-streak">0</span>
+            <span class="stat-label">Longest Streak</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-total-completions">0</span>
+            <span class="stat-label">Total Days</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="stat-rate-30d">0%</span>
+            <span class="stat-label">Last 30 Days</span>
+          </div>
+        </div>
+
+        <div class="history-section">
+          <h3>Completion History (Past 30 Days)</h3>
+          <div id="history-grid" class="history-grid" role="grid" aria-label="Daily Completion Grid">
+            <!-- Dynamically populated 30 days grid -->
+          </div>
+        </div>
+
+        <div class="habit-danger-zone">
+          <button type="button" id="btn-archive-habit" class="btn btn-secondary btn-sm">Archive Habit</button>
+          <button type="button" id="btn-delete-habit" class="btn btn-danger btn-sm">Delete Habit</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Main ES Module Script Entry Point -->
+  <script type="module" src="js/ui/app.js"></script>
+</body>
+</html>

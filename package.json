@@ -1,0 +1,19 @@
+{
+  "name": "simple-streak-tracker",
+  "version": "1.0.0",
+  "description": "Simple static habit and streak tracker with CSV storage",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "test": "node --test tests/unit/*.test.js"
+  },
+  "keywords": [
+    "habits",
+    "streaks",
+    "tracker",
+    "csv",
+    "static-web-app"
+  ],
+  "author": "",
+  "license": "MIT"
+}
