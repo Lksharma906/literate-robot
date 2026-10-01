@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "streak-fitness-tracker",
+  "compatibility_date": "2026-09-28",
+  "assets": {
+    "directory": "./src",
+    "binding": "ASSETS"
+  }
+}

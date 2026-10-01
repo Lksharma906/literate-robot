@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev-server.js",
-    "test": "node --test tests/unit/*.test.js"
+    "test": "node --test tests/unit/*.test.js",
+    "deploy:pages": "npx -y wrangler pages deploy src --project-name=streak-fitness-tracker",
+    "deploy:worker": "npx -y wrangler deploy"
   },
   "keywords": [
     "habits",
